@@ -11,11 +11,13 @@ command_exists() {
 
 checkEnv() {
     ## Check for requirements.
-    REQUIREMENTS='curl groups sudo'
-    if ! command_exists ${REQUIREMENTS}; then
-        echo -e "${RED}To run me, you need: ${REQUIREMENTS}${RC}"
-        exit 1
-    fi
+    REQUIREMENTS=('curl' 'groups' 'sudo')
+    for req in "${REQUIREMENTS[@]}"; do
+        if ! command_exists ${req}; then
+            echo -e "${RED}To run me, you need: ${req}${RC}"
+            exit 1
+        fi
+    done
 
     ## Check Package Handeler
     PACKAGEMANAGER='apt yum dnf pacman zypper'
@@ -23,11 +25,12 @@ checkEnv() {
         if command_exists ${pgm}; then
             PACKAGER=${pgm}
             echo -e "Using ${pgm}"
+            break
         fi
     done
 
     if [ -z "${PACKAGER}" ]; then
-        echo -e "${RED}Can't find a supported package manager"
+        echo -e "${RED}Can't find a supported package manager${RC}"
         exit 1
     fi
 
@@ -41,18 +44,18 @@ checkEnv() {
     ## Check SuperUser Group
     SUPERUSERGROUP='wheel sudo root'
     for sug in ${SUPERUSERGROUP}; do
-        if groups | grep ${sug}; then
+        if groups | grep -q ${sug}; then
             SUGROUP=${sug}
             echo -e "Super user group ${SUGROUP}"
+            break
         fi
     done
 
     ## Check if member of the sudo group.
-    if ! groups | grep ${SUGROUP} >/dev/null; then
-        echo -e "${RED}You need to be a member of the sudo group to run me!"
+    if ! groups | grep -q ${SUGROUP}; then
+        echo -e "${RED}You need to be a member of the sudo group to run me!${RC}"
         exit 1
     fi
-
 }
 
 installDepend() {
