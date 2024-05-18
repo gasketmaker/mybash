@@ -42,8 +42,8 @@ checkEnv() {
     fi
 
     ## Check SuperUser Group
-    SUPERUSERGROUP='wheel sudo root'
-    for sug in ${SUPERUSERGROUP}; do
+    SUPERUSERGROUP=('wheel' 'sudo' 'root')
+    for sug in "${SUPERUSERGROUP[@]}"; do
         if groups | grep -q ${sug}; then
             SUGROUP=${sug}
             echo -e "Super user group ${SUGROUP}"
