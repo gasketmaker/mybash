@@ -19,7 +19,7 @@ checkEnv() {
         fi
     done
 
-    ## Check Package Handeler
+    ## Check Package Handler
     PACKAGEMANAGER='apt yum dnf pacman zypper'
     for pgm in ${PACKAGEMANAGER}; do
         if command_exists ${pgm}; then
@@ -60,7 +60,7 @@ checkEnv() {
 
 installDepend() {
     ## Check for dependencies.
-    DEPENDENCIES='bash bash-completion tar neovim bat tree multitail fastfetch'
+    DEPENDENCIES='bash bash-completion tar neovim bat tree multitail'
     echo -e "${YELLOW}Installing dependencies...${RC}"
     if [[ $PACKAGER == "pacman" ]]; then
         if ! command_exists yay && ! command_exists paru; then
@@ -113,11 +113,15 @@ installZoxide() {
         echo -e "${RED}Something went wrong during zoxide install!${RC}"
         exit 1
     fi
+
+    echo "Adding zoxide to PATH"
+    echo 'export PATH=$PATH:/root/.local/bin' >> ~/.bashrc
+    export PATH=$PATH:/root/.local/bin
 }
 
 install_additional_dependencies() {
    sudo apt update
-   sudo apt install -y trash-cli bat meld jpico
+   sudo apt install -y trash-cli bat meld
 }
 
 linkConfig() {
@@ -134,6 +138,8 @@ linkConfig() {
     fi
 
     echo -e "${YELLOW}Linking new bash config file...${RC}"
+    ## Make sure the .config directory exists
+    mkdir -p ${USER_HOME}/.config
     ## Make symbolic link.
     ln -svf ${GITPATH}/.bashrc ${USER_HOME}/.bashrc
     ln -svf ${GITPATH}/starship.toml ${USER_HOME}/.config/starship.toml
